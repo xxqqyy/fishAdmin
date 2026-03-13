@@ -77,6 +77,7 @@ const resourceConfigs = {
     columns: [
       { title: 'ID', dataIndex: '_id', width: 220 },
       { title: '昵称', dataIndex: 'nickname', width: 160 },
+      { title: '角色', dataIndex: 'role', width: 100, render: (value) => value || 'user' },
       { title: '城市', dataIndex: 'city', width: 120 },
       { title: '等级', dataIndex: 'level', width: 140, render: (value) => value || '-' },
       { title: '积分', dataIndex: 'integral', width: 100, render: (value) => value ?? 0 },
@@ -85,6 +86,15 @@ const resourceConfigs = {
     fields: [
       { name: '_id', label: '用户 ID', placeholder: '留空自动生成' },
       { name: 'nickname', label: '昵称', required: true },
+      {
+        name: 'role',
+        label: '角色',
+        type: 'select',
+        options: [
+          { label: 'user', value: 'user' },
+          { label: 'admin', value: 'admin' }
+        ]
+      },
       { name: 'city', label: '城市', required: true },
       { name: 'phone', label: '手机号' },
       { name: 'gender', label: '性别', placeholder: '例如 0 / 1 / 2' },
