@@ -6,15 +6,18 @@ import {
   Col,
   Empty,
   Input,
+  Popconfirm,
   Row,
   Segmented,
   Space,
   Table,
   Tag,
+  Tooltip,
   Typography
 } from 'antd';
 import {
   EyeInvisibleOutlined,
+  ExclamationCircleOutlined,
   RedoOutlined,
   ReloadOutlined,
   SafetyOutlined
@@ -163,28 +166,37 @@ function ModerationPage() {
     {
       title: '快速操作',
       key: 'actions',
-      width: 220,
+      width: 240,
       render: (_, record) => {
         const status = normalizeModerationStatus(record.status);
         return (
-          <Space size="small">
-            <Button
-              icon={<EyeInvisibleOutlined />}
-              danger
-              disabled={status === 'hidden'}
-              onClick={() => handleAction('hide', record)}
-            />
-            <Button
-              icon={<SafetyOutlined />}
-              type="primary"
-              disabled={status === 'resolved'}
-              onClick={() => handleAction('resolve', record)}
-            />
-            <Button
-              icon={<RedoOutlined />}
-              disabled={status === 'pending'}
-              onClick={() => handleAction('restore', record)}
-            />
+          <Space size="small" className="action-btn-group">
+            <Tooltip title="隐藏内容，用户将无法查看">
+              <Button
+                icon={<EyeInvisibleOutlined />}
+                danger
+                disabled={status === 'hidden'}
+                loading={submitting === 'hide'}
+                onClick={() => handleAction('hide', record)}
+              />
+            </Tooltip>
+            <Tooltip title="标记为已处置，保持可见">
+              <Button
+                icon={<SafetyOutlined />}
+                type="primary"
+                disabled={status === 'resolved'}
+                loading={submitting === 'resolve'}
+                onClick={() => handleAction('resolve', record)}
+              />
+            </Tooltip>
+            <Tooltip title="恢复展示，取消治理操作">
+              <Button
+                icon={<RedoOutlined />}
+                disabled={status === 'pending'}
+                loading={submitting === 'restore'}
+                onClick={() => handleAction('restore', record)}
+              />
+            </Tooltip>
             <Button type="link" onClick={() => setActiveItem(record)}>
               详情
             </Button>
@@ -255,30 +267,58 @@ function ModerationPage() {
             />
           </Space>
 
-          <Space wrap>
-            <Button
-              danger
+          <Space wrap className="action-btn-group">
+            <Popconfirm
+              title="批量隐藏确认"
+              description={`确认隐藏选中的 ${selectedItems.length} 条内容？此操作将使内容对用户不可见。`}
+              icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
+              onConfirm={() => handleBatchAction('hide')}
+              okText="确认隐藏"
+              cancelText="取消"
+              okButtonProps={{ danger: true }}
               disabled={!selectedItems.length}
-              loading={submitting === 'hide'}
-              onClick={() => handleBatchAction('hide')}
             >
-              批量隐藏
-            </Button>
-            <Button
-              type="primary"
+              <Button
+                danger
+                disabled={!selectedItems.length}
+                loading={submitting === 'hide'}
+              >
+                批量隐藏
+              </Button>
+            </Popconfirm>
+            <Popconfirm
+              title="批量处置确认"
+              description={`确认将选中的 ${selectedItems.length} 条内容标记为已处置？`}
+              icon={<ExclamationCircleOutlined style={{ color: '#1677ff' }} />}
+              onConfirm={() => handleBatchAction('resolve')}
+              okText="确认处置"
+              cancelText="取消"
               disabled={!selectedItems.length}
-              loading={submitting === 'resolve'}
-              onClick={() => handleBatchAction('resolve')}
             >
-              批量处置
-            </Button>
-            <Button
+              <Button
+                type="primary"
+                disabled={!selectedItems.length}
+                loading={submitting === 'resolve'}
+              >
+                批量处置
+              </Button>
+            </Popconfirm>
+            <Popconfirm
+              title="批量恢复确认"
+              description={`确认恢复选中的 ${selectedItems.length} 条内容的展示？`}
+              icon={<ExclamationCircleOutlined style={{ color: '#faad14' }} />}
+              onConfirm={() => handleBatchAction('restore')}
+              okText="确认恢复"
+              cancelText="取消"
               disabled={!selectedItems.length}
-              loading={submitting === 'restore'}
-              onClick={() => handleBatchAction('restore')}
             >
-              批量恢复
-            </Button>
+              <Button
+                disabled={!selectedItems.length}
+                loading={submitting === 'restore'}
+              >
+                批量恢复
+              </Button>
+            </Popconfirm>
           </Space>
         </Space>
       </Card>

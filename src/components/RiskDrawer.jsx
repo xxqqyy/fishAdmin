@@ -11,8 +11,10 @@ import {
   Skeleton,
   Space,
   Tag,
+  Tooltip,
   Typography
 } from 'antd';
+import { FileImageOutlined } from '@ant-design/icons';
 import { getRiskTargetPreview } from '../lib/api';
 import {
   formatStatusLabel,
@@ -22,6 +24,31 @@ import {
 } from '../lib/formatters';
 
 const { Paragraph, Text, Title } = Typography;
+
+function ImageWithFallback({ src, alt, className }) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed || !src) {
+    return (
+      <div className="preview-image-fallback">
+        <Space direction="vertical" align="center" size={4}>
+          <FileImageOutlined style={{ fontSize: 24 }} />
+          <span>图片加载失败</span>
+        </Space>
+      </div>
+    );
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      className={className}
+      onError={() => setFailed(true)}
+      fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmNWY5Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5NGEzYjgiIGZvbnQtc2l6ZT0iMTIiPuWKoOi9veWksei0pTwvdGV4dD48L3N2Zz4="
+    />
+  );
+}
 
 function ContentPreview({ item, preview }) {
   if (!preview?.detail) {
@@ -66,7 +93,7 @@ function ContentPreview({ item, preview }) {
         <Image.PreviewGroup>
           <div className="preview-grid">
             {imageList.slice(0, 4).map((imageUrl, index) => (
-              <Image
+              <ImageWithFallback
                 key={`${imageUrl}-${index}`}
                 src={imageUrl}
                 alt={detail.title || item.title}
@@ -106,7 +133,7 @@ function SpotPreview({ preview }) {
         <Image.PreviewGroup>
           <div className="preview-grid">
             {spot.images.slice(0, 4).map((imageUrl, index) => (
-              <Image key={`${imageUrl}-${index}`} src={imageUrl} alt={spot.name} className="preview-image" />
+              <ImageWithFallback key={`${imageUrl}-${index}`} src={imageUrl} alt={spot.name} className="preview-image" />
             ))}
           </div>
         </Image.PreviewGroup>
@@ -185,30 +212,36 @@ function RiskDrawer({ open, item, onClose, onAction, submitting }) {
       width={520}
       title={item?.title || '风险内容详情'}
       extra={
-        <Space>
-          <Button
-            danger
-            disabled={!item || status === 'hidden'}
-            loading={submitting === 'hide'}
-            onClick={() => onAction?.('hide', item)}
-          >
-            隐藏内容
-          </Button>
-          <Button
-            type="primary"
-            disabled={!item || status === 'resolved'}
-            loading={submitting === 'resolve'}
-            onClick={() => onAction?.('resolve', item)}
-          >
-            标记处置
-          </Button>
-          <Button
-            disabled={!item || status === 'pending'}
-            loading={submitting === 'restore'}
-            onClick={() => onAction?.('restore', item)}
-          >
-            恢复展示
-          </Button>
+        <Space className="action-btn-group">
+          <Tooltip title="隐藏内容，用户将无法查看">
+            <Button
+              danger
+              disabled={!item || status === 'hidden'}
+              loading={submitting === 'hide'}
+              onClick={() => onAction?.('hide', item)}
+            >
+              隐藏内容
+            </Button>
+          </Tooltip>
+          <Tooltip title="标记为已处置，保持可见">
+            <Button
+              type="primary"
+              disabled={!item || status === 'resolved'}
+              loading={submitting === 'resolve'}
+              onClick={() => onAction?.('resolve', item)}
+            >
+              标记处置
+            </Button>
+          </Tooltip>
+          <Tooltip title="恢复展示，取消治理操作">
+            <Button
+              disabled={!item || status === 'pending'}
+              loading={submitting === 'restore'}
+              onClick={() => onAction?.('restore', item)}
+            >
+              恢复展示
+            </Button>
+          </Tooltip>
         </Space>
       }
     >

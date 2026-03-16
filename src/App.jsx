@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { Skeleton, Spin } from 'antd';
 import AppShell from './components/AppShell';
 import { getHealth } from './lib/api';
 
@@ -10,7 +11,16 @@ const ReportsPage = lazy(() => import('./pages/ReportsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
 function RouteFallback() {
-  return <div className="route-loading">页面加载中...</div>;
+  return (
+    <div className="route-loading">
+      <Spin size="large" tip="页面加载中...">
+        <div className="route-loading-skeleton">
+          <Skeleton active paragraph={{ rows: 4 }} />
+          <Skeleton active paragraph={{ rows: 6 }} style={{ marginTop: 24 }} />
+        </div>
+      </Spin>
+    </div>
+  );
 }
 
 function App() {

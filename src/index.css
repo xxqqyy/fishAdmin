@@ -41,6 +41,53 @@ a {
   height: 100vh;
   padding: 24px 16px;
   box-shadow: 12px 0 30px rgba(15, 23, 42, 0.18);
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.app-sider-collapsed {
+  padding: 24px 8px;
+}
+
+/* 简约细线风格 */
+.sider-collapse-trigger {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+}
+
+.collapse-btn {
+  width: 100%;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-size: 12px;
+  background: transparent !important;
+  border: 1px dashed rgba(255, 255, 255, 0.2) !important;
+  transition: all 0.2s ease;
+}
+
+.collapse-btn:hover {
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.app-sider-collapsed .sider-collapse-trigger {
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 16px);
+}
+
+.app-sider-collapsed .collapse-btn {
+  width: 100%;
+  height: 32px;
+  justify-content: center;
 }
 
 .brand-block {
@@ -48,6 +95,16 @@ a {
   align-items: center;
   gap: 14px;
   padding: 8px 8px 24px;
+  transition: all 0.3s ease;
+}
+
+.brand-block-collapsed {
+  justify-content: center;
+  padding: 8px 4px 24px;
+}
+
+.brand-block-collapsed .brand-avatar {
+  box-shadow: 0 8px 20px rgba(56, 189, 248, 0.35);
 }
 
 .brand-avatar {
@@ -189,9 +246,127 @@ a {
 }
 
 .route-loading {
-  padding: 40px 0;
-  color: #64748b;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 60px 40px;
+}
+
+.route-loading-skeleton {
+  width: 100%;
+  max-width: 800px;
+  padding: 24px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* 页面进入动画 */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-section-header,
+.glass-card {
+  animation: fadeSlideIn 0.35s ease-out;
+}
+
+/* 操作按钮悬停效果 */
+.action-btn-group .ant-btn {
+  transition: all 0.2s ease;
+}
+
+.action-btn-group .ant-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 表格行悬停效果 */
+.ant-table-tbody > tr.ant-table-row:hover > td {
+  background: rgba(22, 119, 255, 0.04) !important;
+}
+
+/* 图片加载失败样式 */
+.preview-image-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 132px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+/* 成功操作动效 */
+@keyframes successPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.success-pulse {
+  animation: successPulse 0.3s ease;
+}
+
+/* 表格空状态优化 */
+.ant-empty {
+  padding: 32px 0;
+}
+
+.ant-empty-description {
+  color: #94a3b8;
+}
+
+/* 表格加载状态优化 */
+.ant-table-wrapper .ant-spin-nested-loading > div > .ant-spin {
+  max-height: none;
+}
+
+.ant-table-placeholder {
+  background: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* 标签悬停效果 */
+.ant-tag {
+  transition: all 0.2s ease;
+}
+
+.ant-tag:hover {
+  transform: scale(1.05);
+}
+
+/* 卡片悬停效果 */
+.glass-card:hover {
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+  transition: box-shadow 0.3s ease;
+}
+
+/* 按钮组间距优化 */
+.action-btn-group {
+  gap: 4px;
+}
+
+/* 分页器优化 */
+.ant-pagination {
+  margin-top: 16px !important;
+}
+
+.ant-pagination-item-active {
+  border-color: #1677ff !important;
+  background: linear-gradient(135deg, #1677ff 0%, #38bdf8 100%) !important;
+}
+
+.ant-pagination-item-active a {
+  color: #fff !important;
 }
 
 .json-panel {

@@ -9,15 +9,24 @@ import {
   Form,
   Input,
   Modal,
+  Popconfirm,
   Row,
   Select,
   Space,
   Table,
   Tabs,
   Tag,
+  Tooltip,
   Typography
 } from 'antd';
-import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  ExclamationCircleOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  ReloadOutlined
+} from '@ant-design/icons';
 import KpiCard from '../components/KpiCard';
 import {
   createAdminResource,
@@ -338,7 +347,7 @@ function RecommendationCard({ title, spot }) {
 }
 
 function DataManagementPage() {
-  const { message, modal } = App.useApp();
+  const { message } = App.useApp();
   const [form] = Form.useForm();
   const [overview, setOverview] = useState(null);
   const [activeResource, setActiveResource] = useState('users');
@@ -375,19 +384,33 @@ function DataManagementPage() {
       {
         title: '操作',
         key: 'actions',
-        width: 180,
+        width: 200,
         fixed: 'right',
         render: (_, record) => (
-          <Space size="small">
-            <Button type="link" icon={<EyeOutlined />} onClick={() => setDetailRecord(record)}>
-              详情
-            </Button>
-            <Button type="link" icon={<EditOutlined />} onClick={() => openEditor(record)}>
-              编辑
-            </Button>
-            <Button danger type="link" icon={<DeleteOutlined />} onClick={() => handleDelete(record)}>
-              删除
-            </Button>
+          <Space size="small" className="action-btn-group">
+            <Tooltip title="查看详情">
+              <Button type="link" icon={<EyeOutlined />} onClick={() => setDetailRecord(record)}>
+                详情
+              </Button>
+            </Tooltip>
+            <Tooltip title="编辑记录">
+              <Button type="link" icon={<EditOutlined />} onClick={() => openEditor(record)}>
+                编辑
+              </Button>
+            </Tooltip>
+            <Popconfirm
+              title={`删除${resourceConfig.label}`}
+              description={`确认删除 ${record._id} 吗？此操作不可恢复。`}
+              icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
+              onConfirm={() => handleDeleteConfirmed(record)}
+              okText="确认删除"
+              cancelText="取消"
+              okButtonProps={{ danger: true }}
+            >
+              <Button danger type="link" icon={<DeleteOutlined />}>
+                删除
+              </Button>
+            </Popconfirm>
           </Space>
         )
       }
@@ -524,24 +547,19 @@ function DataManagementPage() {
     }
   }
 
-  function handleDelete(record) {
-    modal.confirm({
-      title: `删除${resourceConfig.label}`,
-      content: `确认删除 ${record._id} 吗？此操作不可恢复。`,
-      okText: '删除',
-      okButtonProps: { danger: true },
-      cancelText: '取消',
-      onOk: async () => {
-        await deleteAdminResource(activeResource, record._id);
-        message.success(`${resourceConfig.label}已删除`);
-        if (records.length === 1 && page > 1) {
-          setPage((value) => value - 1);
-        } else {
-          await loadRecords();
-        }
-        await loadOverview();
+  async function handleDeleteConfirmed(record) {
+    try {
+      await deleteAdminResource(activeResource, record._id);
+      message.success(`${resourceConfig.label}已删除`);
+      if (records.length === 1 && page > 1) {
+        setPage((value) => value - 1);
+      } else {
+        await loadRecords();
       }
-    });
+      await loadOverview();
+    } catch (error) {
+      message.error(error.message || '删除失败');
+    }
   }
 
   function handleTabChange(key) {

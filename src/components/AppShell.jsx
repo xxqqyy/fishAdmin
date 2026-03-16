@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Alert,
   Avatar,
@@ -6,12 +7,15 @@ import {
   Menu,
   Space,
   Tag,
+  Tooltip,
   Typography
 } from 'antd';
 import {
   DashboardOutlined,
   DatabaseOutlined,
   FlagOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
   NotificationOutlined,
   ReloadOutlined,
   SafetyCertificateOutlined,
@@ -46,30 +50,54 @@ function AppShell({ healthState, onHealthCheck }) {
   const location = useLocation();
   const navigate = useNavigate();
   const config = getApiConfig();
+  const [collapsed, setCollapsed] = useState(false);
 
   const selectedKey = menuItems.find((item) => location.pathname.startsWith(item.key))?.key || '/dashboard';
 
   return (
     <Layout className="app-layout">
-      <Sider width={260} className="app-sider">
-        <div className="brand-block">
-          <Avatar size={46} shape="square" icon={<NotificationOutlined />} className="brand-avatar" />
-          <div>
-            <Title level={4} className="brand-title">
-              Fish Admin
-            </Title>
-            <Text className="brand-subtitle">内容治理、风控与数据管理后台</Text>
-          </div>
+      <Sider
+        width={260}
+        collapsedWidth={80}
+        collapsible
+        collapsed={collapsed}
+        trigger={null}
+        className={`app-sider ${collapsed ? 'app-sider-collapsed' : ''}`}
+      >
+        <div className={`brand-block ${collapsed ? 'brand-block-collapsed' : ''}`}>
+          <Avatar size={collapsed ? 40 : 46} shape="square" icon={<NotificationOutlined />} className="brand-avatar" />
+          {!collapsed && (
+            <div>
+              <Title level={4} className="brand-title">
+                Fish Admin
+              </Title>
+              <Text className="brand-subtitle">内容治理、风控与数据管理后台</Text>
+            </div>
+          )}
         </div>
 
         <Menu
           mode="inline"
           theme="dark"
+          inlineCollapsed={collapsed}
           selectedKeys={[selectedKey]}
           items={menuItems}
           onClick={({ key }) => navigate(key)}
           className="app-menu"
         />
+
+        <div className="sider-collapse-trigger">
+          <Tooltip title={collapsed ? '展开菜单' : ''} placement="right">
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              className="collapse-btn"
+            >
+              {!collapsed && '收起'}
+            </Button>
+          </Tooltip>
+        </div>
       </Sider>
 
       <Layout>
